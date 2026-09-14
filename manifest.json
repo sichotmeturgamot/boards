@@ -1,19 +1,41 @@
 {
-  "id": "/boards/",
-  "name": "לוח",
-  "short_name": "לוח",
-  "description": "קנבס כרטיסים שמור בגיטהאב",
-  "start_url": "./index.html",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "any",
-  "background_color": "#e7e6ef",
-  "theme_color": "#4a3fbd",
-  "lang": "he",
-  "dir": "rtl",
-  "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+ "nodes": [
+  {
+   "id": "k4p8toplfsbv",
+   "x": 344,
+   "y": -24,
+   "type": "text",
+   "text": "קוביה ראשון ",
+   "width": 144,
+   "height": 280
+  },
+  {
+   "id": "xgz1fbzgg5fo",
+   "x": 8,
+   "y": -80,
+   "type": "group",
+   "label": "קבוצה",
+   "width": 520,
+   "height": 360
+  },
+  {
+   "id": "fa5h7fr3geru",
+   "x": 200,
+   "y": -24,
+   "type": "text",
+   "text": "קוביה שניה",
+   "width": 136,
+   "height": 120
+  },
+  {
+   "id": "a8d4iy3rgsd7",
+   "x": 32,
+   "y": 112,
+   "type": "text",
+   "text": "קוביה שלישית",
+   "width": 296,
+   "height": 144
+  }
+ ],
+ "edges": []
 }
