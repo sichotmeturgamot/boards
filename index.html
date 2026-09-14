@@ -174,11 +174,18 @@ html[data-theme="dark"] .node::before{box-shadow:inset 0 1px 0 rgba(255,255,255,
 .node.in{animation:pop .34s var(--ease) both}
 @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
 
+.node,.node *{touch-action:none;-webkit-user-select:none;user-select:none}
+.node.dragging{z-index:8;box-shadow:var(--sh-3);cursor:grabbing}
 .body{
-  flex:1 1 auto; overflow:auto; border-radius:calc(var(--r-m) - 1px);
+  flex:1 1 auto; overflow:hidden; border-radius:calc(var(--r-m) - 1px);
   padding:12px 14px; direction:rtl; text-align:right;
   font-size:15px; line-height:1.62; letter-spacing:-.003em; word-break:break-word;
+  pointer-events:none;
 }
+.body a,.body input,.elabel{pointer-events:auto}
+
+.editor{touch-action:auto;-webkit-user-select:text;user-select:text;pointer-events:auto}
+
 .body::-webkit-scrollbar{width:7px}
 .body::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px;border:2px solid transparent;background-clip:padding-box}
 .body h1,.body h2,.body h3,.body h4{font-family:var(--ui);font-weight:600;letter-spacing:-.015em;color:var(--ink)}
@@ -441,8 +448,24 @@ const S = {
   undo:[], redo:[], editing:null, anim:true
 };
 const CFG = {
-  owner:"", repo:"", branch:"main", dir:"boards", token:"", theme:"auto", last:""
+  owner:"", repo:"", branch:"main", dir:"", token:"", theme:"auto", last:""
 };
+const LOCAL = "local:";
+function isLocalPath(path){ return !path || String(path).startsWith(LOCAL); }
+function heErr(e){
+  const m=String(e&&e.message||e||"");
+  if(/Failed to fetch|NetworkError|Load failed/i.test(m))
+    return "אין חיבור לשרת. בדקו אינטרנט, או פתחו הגדרות והדביקו טוקן.";
+  if(/Bad credentials|401|Requires authentication/i.test(m))
+    return "הטוקן לא תקין או פג. פתחו הגדרות והדביקו טוקן חדש.";
+  if(/404|Not Found/i.test(m))
+    return "הריפו או התיקייה לא נמצאו. בדקו משתמש / ריפו בהגדרות.";
+  if(/403|rate limit|Resource not accessible/i.test(m))
+    return "אין הרשאת כתיבה לריפו. בטוקן צריך Contents: Read and write.";
+  if(/409|does not match/i.test(m))
+    return "הקובץ השתנה במקום אחר.";
+  return m;
+}
 
 /* ---------- storage ---------- */
 const LS = {
@@ -450,7 +473,16 @@ const LS = {
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
   del(k){ try{ localStorage.removeItem(k);}catch(e){} }
 };
-function loadCfg(){ Object.assign(CFG, LS.get("luach.cfg",{})); }
+function loadCfg(){
+  Object.assign(CFG, LS.get("luach.cfg",{}));
+  if(!CFG.owner && /\.github\.io$/.test(location.hostname)){
+    CFG.owner=location.hostname.split(".")[0];
+  }
+  if(!CFG.repo && /\.github\.io$/.test(location.hostname)){
+    CFG.repo=location.pathname.split("/").filter(Boolean)[0]||"boards";
+  }
+  if(CFG.dir==="boards" && (!CFG.repo || CFG.repo==="boards")) CFG.dir="";
+}
 function saveCfg(){ LS.set("luach.cfg",CFG); }
 
 /* ---------- utils ---------- */
@@ -668,6 +700,22 @@ function bezier(a,b){
   };
 }
 function render(){ renderNodes(); renderEdges(); updateBar(); }
+function updateEdgePaths(){
+  const svg=$("#edges");
+  S.doc.edges.forEach(e=>{
+    const a=nodeById(e.fromNode), b=nodeById(e.toNode);
+    if(!a||!b) return;
+    let fs=e.fromSide, ts=e.toSide;
+    if(!fs||!ts){ const sds=autoSides(a,b); fs=fs||sds[0]; ts=ts||sds[1]; }
+    const bz=bezier(anchorPt(a,fs),anchorPt(b,ts));
+    const g=svg.querySelector('g[data-id="'+e.id+'"]');
+    if(g){
+      g.querySelectorAll("path").forEach(p=>p.setAttribute("d",bz.d));
+    }
+    const lb=[...document.querySelectorAll(".elabel")].find(el=>el._eid===e.id);
+    if(lb){ lb.style.left=bz.mid.x+"px"; lb.style.top=bz.mid.y+"px"; }
+  });
+}
 function renderNodes(){
   const layer=$("#layer");
   layer.innerHTML="";
@@ -719,7 +767,7 @@ function renderEdges(){
     hit.addEventListener("dblclick",ev=>{ ev.stopPropagation(); editEdgeLabel(e); });
     if(e.label){
       const lb=document.createElement("div");
-      lb.className="elabel"; lb.textContent=e.label;
+      lb.className="elabel"; lb.textContent=e.label; lb._eid=e.id;
       lb.style.left=bz.mid.x+"px"; lb.style.top=bz.mid.y+"px";
       lb.addEventListener("dblclick",ev=>{ev.stopPropagation(); editEdgeLabel(e);});
       lb.addEventListener("pointerdown",ev=>{ev.stopPropagation(); selectEdge(e.id);});
@@ -874,10 +922,10 @@ stage.addEventListener("pointerdown",ev=>{
     stage.setPointerCapture(ev.pointerId); return;
   }
   if(nodeEl){
+    ev.preventDefault();
     const id=nodeEl.dataset.id;
     if(!S.sel.has(id)) selectNode(id, ev.shiftKey||ev.ctrlKey||ev.metaKey);
     else if(ev.shiftKey){ S.sel.delete(id); render(); return; }
-    pushUndo();
     const ids=[...S.sel];
     const grp=nodeById(id);
     let extra=[];
@@ -887,8 +935,9 @@ stage.addEventListener("pointerdown",ev=>{
         m.y+m.height/2>grp.y&&m.y+m.height/2<grp.y+grp.height).map(m=>m.id);
     }
     const all=[...new Set([...ids,...extra])];
+    all.forEach(i=>{ const el=$(`.node[data-id="${i}"]`); if(el) el.classList.add("dragging"); });
     drag={mode:"move",ids:all,sx:ev.clientX,sy:ev.clientY,
-          orig:all.map(i=>{const n=nodeById(i);return{id:i,x:n.x,y:n.y};}),moved:false};
+          orig:all.map(i=>{const n=nodeById(i);return{id:i,x:n.x,y:n.y};}),moved:false,undoPushed:false};
     stage.setPointerCapture(ev.pointerId); return;
   }
   // empty space
@@ -916,19 +965,28 @@ stage.addEventListener("pointermove",ev=>{
   if(drag.mode==="pan"){
     S.view.x=drag.vx+(ev.clientX-drag.sx); S.view.y=drag.vy+(ev.clientY-drag.sy); applyView();
   } else if(drag.mode==="move"){
-    if(Math.abs(dx)+Math.abs(dy)>1) drag.moved=true;
-    drag.orig.forEach(o=>{ const n=nodeById(o.id); if(!n) return;
-      n.x=Math.round((o.x+dx)/8)*8; n.y=Math.round((o.y+dy)/8)*8;
-      const el=$(`.node[data-id="${o.id}"]`); if(el){ el.style.left=n.x+"px"; el.style.top=n.y+"px"; } });
-    renderEdges();
+    if(Math.abs(ev.clientX-drag.sx)+Math.abs(ev.clientY-drag.sy)>3) drag.moved=true;
+    if(!drag.moved) return;
+    if(!drag.undoPushed){ pushUndo(); drag.undoPushed=true; }
+    drag._dx=dx; drag._dy=dy;
+    if(drag._raf) return;
+    drag._raf=requestAnimationFrame(()=>{
+      drag._raf=0;
+      if(!drag||drag.mode!=="move") return;
+      const mx=drag._dx, my=drag._dy;
+      drag.orig.forEach(o=>{ const n=nodeById(o.id); if(!n) return;
+        n.x=o.x+mx; n.y=o.y+my;
+        const el=$(`.node[data-id="${o.id}"]`); if(el){ el.style.left=n.x+"px"; el.style.top=n.y+"px"; } });
+      updateEdgePaths();
+    });
   } else if(drag.mode==="resize"){
     const n=nodeById(drag.id); if(!n) return;
-    n.width=Math.max(120,Math.round((drag.w0-dx)/8)*8);
-    n.height=Math.max(60,Math.round((drag.h0+dy)/8)*8);
+    n.width=Math.max(120,drag.w0-dx);
+    n.height=Math.max(60,drag.h0+dy);
     n.x=drag.x0+(drag.w0-n.width);
     const el=$(`.node[data-id="${n.id}"]`);
     if(el){ el.style.left=n.x+"px"; el.style.width=n.width+"px"; el.style.height=n.height+"px"; }
-    renderEdges();
+    updateEdgePaths();
   } else if(drag.mode==="wire"){
     drag.to=toWorld(ev.clientX,ev.clientY);
     drawTempWire();
@@ -974,8 +1032,26 @@ function endPointer(ev){
     S.doc.nodes.forEach(n=>{ if(n.x+n.width>a.x&&n.x<b.x&&n.y+n.height>a.y&&n.y<b.y) S.sel.add(n.id); });
     drag=null; render(); return;
   }
-  if(drag.mode==="move"&&!drag.moved) S.undo.pop();
-  if((drag.mode==="move"&&drag.moved)||drag.mode==="resize") markDirty();
+  if(drag._raf){ cancelAnimationFrame(drag._raf); drag._raf=0; }
+  document.querySelectorAll(".node.dragging").forEach(el=>el.classList.remove("dragging"));
+  if(drag.mode==="move"){
+    if(!drag.moved){ /* click only — no undo */ }
+    else {
+      drag.ids.forEach(id=>{
+        const n=nodeById(id); if(!n) return;
+        n.x=Math.round(n.x/8)*8; n.y=Math.round(n.y/8)*8;
+      });
+      markDirty(); render();
+    }
+  } else if(drag.mode==="resize"){
+    const n=nodeById(drag.id);
+    if(n){
+      n.width=Math.max(120,Math.round(n.width/8)*8);
+      n.height=Math.max(60,Math.round(n.height/8)*8);
+      n.x=Math.round(n.x/8)*8;
+    }
+    markDirty(); render();
+  }
   drag=null;
 }
 stage.addEventListener("dblclick",ev=>{
@@ -1105,8 +1181,15 @@ $("#find").addEventListener("keydown",ev=>{
 
 /* ---------- GitHub ---------- */
 function ghReady(){ return CFG.owner&&CFG.repo&&CFG.token; }
+function boardFilePath(name){
+  if(!/\.(canvas|json)$/i.test(name)) name+=".canvas";
+  const dir=String(CFG.dir||"").replace(/^\/|\/$/g,"");
+  return dir? dir+"/"+name : name;
+}
 async function gh(path,opts){
-  const url="https://api.github.com/repos/"+CFG.owner+"/"+CFG.repo+"/contents/"+path;
+  if(!CFG.owner||!CFG.repo) throw new Error("חסרים משתמש או ריפו בהגדרות");
+  if(!CFG.token) throw new Error("חסר טוקן בהגדרות");
+  const url="https://api.github.com/repos/"+CFG.owner+"/"+CFG.repo+"/contents/"+String(path||"").replace(/^\/+/,"");
   const res=await fetch(url,{
     ...opts,
     headers:{
@@ -1127,14 +1210,39 @@ async function listBoards(){
   if(!ghReady()) return [];
   try{
     const items=await gh(CFG.dir+"?ref="+encodeURIComponent(CFG.branch));
-    return items.filter(i=>i.type==="file"&&/\.(canvas|json)$/i.test(i.name))
+    const files=Array.isArray(items)?items:[];
+    return files.filter(i=>i.type==="file"&&/\.(canvas|json)$/i.test(i.name))
                 .map(i=>({name:i.name,path:i.path})).sort((a,b)=>a.name.localeCompare(b.name,"he"));
   }catch(e){
     if(e.status===404) return [];
     throw e;
   }
 }
+function listLocalBoards(){
+  return LS.get("luach.locals",[]).map(b=>({name:b.name,path:b.path,local:true}));
+}
+function upsertLocalMeta(path,name){
+  const list=LS.get("luach.locals",[]);
+  const rec={name:name||path.replace(LOCAL,""),path,ts:Date.now()};
+  const i=list.findIndex(b=>b.path===path);
+  if(i>=0) list[i]=rec; else list.push(rec);
+  LS.set("luach.locals",list);
+}
+function saveLocalDoc(){
+  if(!S.path) S.path=LOCAL+"לוח";
+  upsertLocalMeta(S.path, S.path.replace(LOCAL,"").replace(/\.(canvas|json)$/i,""));
+  LS.set("luach.doc."+S.path,{nodes:S.doc.nodes,edges:S.doc.edges});
+}
+function loadLocalBoard(path){
+  const d=LS.get("luach.doc."+path,{nodes:[],edges:[]});
+  S.doc={nodes:d.nodes||[],edges:d.edges||[]};
+  S.path=path; S.sha=null; S.remote=false; S.dirty=false;
+  S.undo.length=0; S.redo.length=0; S.sel.clear(); S.selEdge=null; S.anim=true;
+  CFG.last=path; saveCfg();
+  render(); fitAll(); setStatus("מקומי","ok");
+}
 async function loadBoard(path){
+  if(isLocalPath(path)){ loadLocalBoard(path); return; }
   setStatus("טוען…","");
   try{
     const j=await gh(path+"?ref="+encodeURIComponent(CFG.branch));
@@ -1148,8 +1256,8 @@ async function loadBoard(path){
   }catch(e){
     const c=LS.get("luach.cache."+path,null);
     if(c){ S.doc=c.doc; S.path=path; S.sha=c.sha; S.remote=true; S.dirty=!!c.dirty;
-      render(); fitAll(); setStatus("עותק מקומי — אין חיבור","err"); toast("נטען מהמטמון המקומי: "+e.message,4000); }
-    else { setStatus("שגיאה","err"); toast("טעינה נכשלה: "+e.message,5000); }
+      render(); fitAll(); setStatus("עותק מקומי — אין חיבור","err"); toast("נטען מהמטמון המקומי: "+heErr(e),4000); }
+    else { setStatus("שגיאה","err"); toast("טעינה נכשלה: "+heErr(e),5000); }
   }
 }
 async function flushLocalImages(){
@@ -1165,6 +1273,13 @@ async function flushLocalImages(){
   }
 }
 async function saveBoard(force){
+  if(isLocalPath(S.path) || !S.remote){
+    if(!S.path) S.path=LOCAL+"לוח";
+    saveLocalDoc();
+    S.dirty=false; setStatus("נשמר במכשיר","ok");
+    if(!ghReady()){ toast("נשמר במכשיר"); return; }
+    if(isLocalPath(S.path)) return;
+  }
   if(!S.remote||!S.path){ downloadBoard(); return; }
   if(!ghReady()){ toast("אין הגדרות גיטהאב"); return; }
   if(S.saving) return;
@@ -1190,12 +1305,22 @@ async function saveBoard(force){
     if(e.status===409||/does not match/i.test(e.message)){
       setStatus("התנגשות","err");
       if(confirm("הלוח שונה במקום אחר מאז שנטען.\n\nלדרוס את הגרסה שבגיטהאב בגרסה שלפניך?\n(ביטול = לא נשמר, כדאי לטעון מחדש)")) saveBoard(true);
-    } else { setStatus("שמירה נכשלה","err"); toast("שמירה נכשלה: "+e.message,5000); }
+    } else { setStatus("שמירה נכשלה","err"); toast("שמירה נכשלה: "+heErr(e),5000); }
   }
 }
 async function createBoard(name){
-  if(!/\.(canvas|json)$/i.test(name)) name+=".canvas";
-  const path=CFG.dir.replace(/\/$/,"")+"/"+name;
+  name=String(name||"").trim();
+  if(!name){ toast("כתבו שם ללוח"); return; }
+  if(!ghReady()){
+    const path=LOCAL+name.replace(/\.(canvas|json)$/i,"");
+    S.doc={nodes:[],edges:[]}; S.path=path; S.remote=false; S.sha=null;
+    S.undo.length=0; S.redo.length=0; S.sel.clear(); S.selEdge=null; S.anim=true;
+    saveLocalDoc(); fillBoardSelect(); render(); fitAll();
+    toast("נוצר לוח מקומי: "+name+" — לשמירה בגיטהאב פתחו הגדרות");
+    setStatus("מקומי","ok");
+    return;
+  }
+  const path=boardFilePath(name);
   try{
     await gh(path,{method:"PUT",body:JSON.stringify({
       message:"לוח חדש: "+name,
@@ -1203,26 +1328,40 @@ async function createBoard(name){
       branch:CFG.branch })});
     await refreshBoards(); $("#boardSel").value=path; await loadBoard(path);
     toast("נוצר לוח: "+name);
-  }catch(e){ toast("יצירה נכשלה: "+e.message,5000); }
+  }catch(e){ toast("יצירה נכשלה: "+heErr(e),6000); }
+}
+function fillBoardSelect(){
+  const sel=$("#boardSel"); sel.innerHTML="";
+  const locals=listLocalBoards();
+  const rem=S.boards||[];
+  if(!locals.length && !rem.length){
+    const o=document.createElement("option"); o.value=""; o.textContent="לוח לדוגמה"; sel.appendChild(o); return;
+  }
+  rem.forEach(b=>{
+    const o=document.createElement("option");
+    o.value=b.path; o.textContent=b.name.replace(/\.(canvas|json)$/i,"");
+    sel.appendChild(o);
+  });
+  locals.forEach(b=>{
+    if(rem.some(r=>r.path===b.path)) return;
+    const o=document.createElement("option");
+    o.value=b.path; o.textContent=b.name+" (מקומי)";
+    sel.appendChild(o);
+  });
+  if(S.path) sel.value=S.path;
 }
 async function refreshBoards(){
   try{
-    S.boards=await listBoards();
-    const sel=$("#boardSel"); sel.innerHTML="";
-    if(!S.boards.length){ sel.innerHTML='<option value="">— אין לוחות —</option>'; }
-    S.boards.forEach(b=>{
-      const o=document.createElement("option");
-      o.value=b.path; o.textContent=b.name.replace(/\.(canvas|json)$/i,"");
-      sel.appendChild(o);
-    });
-    if(S.path) sel.value=S.path;
-  }catch(e){ toast("קריאת רשימת הלוחות נכשלה: "+e.message,5000); }
+    S.boards=ghReady()? await listBoards() : [];
+    fillBoardSelect();
+  }catch(e){ toast("קריאת רשימת הלוחות נכשלה: "+heErr(e),5000); fillBoardSelect(); }
 }
 
 /* ---------- save state ---------- */
 let autosaveT=null;
 function markDirty(){
   S.dirty=true;
+  if(isLocalPath(S.path) || !S.remote) saveLocalDoc();
   setStatus(S.remote?"לא נשמר":"מקומי", S.remote?"dirty":"");
   if(S.path){
     const slim={nodes:S.doc.nodes.map(n=>{const c={...n}; if(c.data&&String(c.data).startsWith("data:")) c.data="[local-image]"; return c;}), edges:S.doc.edges};
@@ -1310,7 +1449,7 @@ function settingsPanel(){
     </div>
     <div class="row">
       <div class="field"><label>ענף</label><input id="f_branch" dir="ltr" value="${esc(CFG.branch)}" placeholder="main"></div>
-      <div class="field"><label>תיקייה</label><input id="f_dir" dir="ltr" value="${esc(CFG.dir)}" placeholder="boards"></div>
+      <div class="field"><label>תיקייה (ריק = שורש הריפו)</label><input id="f_dir" dir="ltr" value="${esc(CFG.dir)}" placeholder=""></div>
     </div>
     <div class="field"><label>טוקן (fine-grained PAT עם הרשאת Contents: Read and write)</label>
       <input id="f_token" dir="ltr" type="password" value="${esc(CFG.token)}" placeholder="github_pat_..."></div>
@@ -1347,7 +1486,7 @@ function settingsPanel(){
   $("#f_save").onclick=async()=>{
     CFG.owner=$("#f_owner").value.trim(); CFG.repo=$("#f_repo").value.trim();
     CFG.branch=$("#f_branch").value.trim()||"main";
-    CFG.dir=$("#f_dir").value.trim().replace(/^\/|\/$/g,"")||"boards";
+    CFG.dir=$("#f_dir").value.trim().replace(/^\/|\/$/g,"");
     CFG.token=$("#f_token").value.trim();
     saveCfg(); closePanel();
     if(ghReady()){ await refreshBoards();
@@ -1359,11 +1498,12 @@ function settingsPanel(){
   $("#f_forget").onclick=()=>{ CFG.token=""; saveCfg(); $("#f_token").value=""; toast("הטוקן נמחק מהדפדפן"); };
 }
 function boardsPanel(){
-  const list=S.boards.map(b=>`<button class="boardrow${b.path===S.path?" cur":""}" data-p="${esc(b.path)}"><span class="dot"></span>${esc(b.name.replace(/\.(canvas|json)$/i,""))}</button>`).join("")
-    || `<p class="sub">אין עדיין לוחות בתיקייה <code>${esc(CFG.dir)}</code>.</p>`;
+  const all=[...(S.boards||[]), ...listLocalBoards().filter(b=>!(S.boards||[]).some(r=>r.path===b.path))];
+  const list=all.map(b=>`<button class="boardrow${b.path===S.path?" cur":""}" data-p="${esc(b.path)}"><span class="dot"></span>${esc(b.name.replace(/\.(canvas|json)$/i,""))}${b.local?" · מקומי":""}</button>`).join("")
+    || `<p class="sub">${ghReady()?"אין עדיין לוחות בריפו.":"אין חיבור לגיטהאב — אפשר ליצור לוח מקומי עכשיו."}</p>`;
   openPanel(`
     <h2>לוחות</h2>
-    <p class="sub">כל לוח הוא קובץ <code>.canvas</code> בתיקייה <code>${esc(CFG.dir)}</code> — תואם ל־Obsidian Canvas.</p>
+    <p class="sub">${ghReady()?"כל לוח הוא קובץ <code>.canvas</code> בריפו.":"הלוח יישמר במכשיר הזה. אחר כך אפשר לחבר גיטהאב בהגדרות."}</p>
     ${list}
     <div class="field" style="margin-top:14px"><label>לוח חדש</label><input id="b_name" placeholder="תכנון תש״ח"></div>
     <div class="actions">
@@ -1440,10 +1580,12 @@ $("#btnTheme").onclick=()=>{
     else if(S.boards.length) await loadBoard(S.boards[0].path);
     else { S.doc=demoDoc(); render(); fitAll(); setStatus("אין לוחות — צור אחד",""); }
   } else {
-    S.doc=demoDoc(); S.remote=false; render(); fitAll();
-    $("#boardSel").innerHTML='<option value="">לוח לדוגמה</option>';
-    setStatus("מקומי — לא מחובר","");
-    setTimeout(()=>toast("לחץ על גלגל השיניים כדי לחבר לגיטהאב",4500),700);
+    const locals=listLocalBoards();
+    fillBoardSelect();
+    const last=want && isLocalPath(want) ? want : (locals[0]&&locals[0].path);
+    if(last && LS.get("luach.doc."+last,null)) loadLocalBoard(last);
+    else { S.doc=demoDoc(); S.remote=false; S.path=""; render(); fitAll(); setStatus("מקומי — לא מחובר",""); }
+    setTimeout(()=>toast("אפשר ליצור לוח עכשיו. לשמירה בענן: גלגל השיניים",4500),700);
   }
 })();
 
