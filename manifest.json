@@ -1,0 +1,19 @@
+{
+  "id": "/boards/",
+  "name": "לוח",
+  "short_name": "לוח",
+  "description": "קנבס כרטיסים שמור בגיטהאב",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#e7e6ef",
+  "theme_color": "#4a3fbd",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
