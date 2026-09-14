@@ -16,7 +16,8 @@
    "type": "group",
    "label": "קבוצה",
    "width": 520,
-   "height": 360
+   "height": 360,
+   "color": "5"
   },
   {
    "id": "fa5h7fr3geru",
