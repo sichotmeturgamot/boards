@@ -5,10 +5,11 @@
    "x": -160,
    "y": -216,
    "type": "text",
-   "text": "כרטיס טקסט",
+   "text": "**היי**",
    "width": 300,
-   "height": 140,
-   "bg": "1"
+   "height": 152,
+   "bg": "1",
+   "align": "center"
   },
   {
    "id": "zzedpl8gjiqz",
