@@ -2,14 +2,15 @@
  "nodes": [
   {
    "id": "wpb7rizyifji",
-   "x": -160,
+   "x": -200,
    "y": -216,
    "type": "text",
-   "text": "**היי**",
-   "width": 300,
-   "height": 152,
+   "text": "**הרב בומי שליט\"א**",
+   "width": 336,
+   "height": 112,
    "bg": "1",
-   "align": "center"
+   "align": "center",
+   "size": 1.75
   },
   {
    "id": "zzedpl8gjiqz",
