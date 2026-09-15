@@ -33,6 +33,15 @@
    "ar": 0.75,
    "fit": "cover",
    "file": "images/mu27vhip-ecezgl-1000092418.jpg"
+  },
+  {
+   "id": "jnx5xpih381k",
+   "x": -280,
+   "y": 656,
+   "type": "text",
+   "text": "- [ ] ",
+   "width": 300,
+   "height": 168
   }
  ],
  "edges": [
