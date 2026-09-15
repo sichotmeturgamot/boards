@@ -23,12 +23,12 @@
   },
   {
    "id": "bok85njvns51",
-   "x": -56,
+   "x": -64,
    "y": -392,
    "type": "group",
    "label": "קבוצה",
-   "width": 368,
-   "height": 576,
+   "width": 376,
+   "height": 480,
    "bg": "4"
   }
  ],
