@@ -2,8 +2,8 @@
  "nodes": [
   {
    "id": "h55b6wunkk2g",
-   "x": 24,
-   "y": -216,
+   "x": 8,
+   "y": -248,
    "type": "text",
    "text": "- [ ] אין יידישקייט\n- [ ] אין לעבן\n- [ ] אין כח\n- [ ] אין נפש\n- [ ] ",
    "width": 208,
@@ -12,8 +12,8 @@
   },
   {
    "id": "xrr5q7ujm82g",
-   "x": -16,
-   "y": -312,
+   "x": -32,
+   "y": -336,
    "type": "text",
    "text": "**מילים להוציא מהמילון**",
    "width": 296,
@@ -23,8 +23,8 @@
   },
   {
    "id": "bok85njvns51",
-   "x": -48,
-   "y": -368,
+   "x": -56,
+   "y": -392,
    "type": "group",
    "label": "קבוצה",
    "width": 368,
@@ -39,6 +39,48 @@
    "fromSide": "bottom",
    "toNode": "h55b6wunkk2g",
    "toSide": "top"
+  },
+  {
+   "id": "sgzzn2mtoufi",
+   "fromNode": "xrr5q7ujm82g",
+   "fromSide": "bottom",
+   "toNode": "h55b6wunkk2g",
+   "toSide": "top"
+  },
+  {
+   "id": "sysiej3goyao",
+   "fromNode": "xrr5q7ujm82g",
+   "fromSide": "bottom",
+   "toNode": "h55b6wunkk2g",
+   "toSide": "top"
+  },
+  {
+   "id": "sfzx6mwaoz7t",
+   "fromNode": "xrr5q7ujm82g",
+   "fromSide": "bottom",
+   "toNode": "h55b6wunkk2g",
+   "toSide": "top"
+  },
+  {
+   "id": "3zgth37jp3az",
+   "fromNode": "xrr5q7ujm82g",
+   "fromSide": "bottom",
+   "toNode": "h55b6wunkk2g",
+   "toSide": "top"
+  },
+  {
+   "id": "7reaah36p566",
+   "fromNode": "h55b6wunkk2g",
+   "fromSide": "top",
+   "toNode": "xrr5q7ujm82g",
+   "toSide": "bottom"
+  },
+  {
+   "id": "xexke3nnp5ta",
+   "fromNode": "h55b6wunkk2g",
+   "fromSide": "top",
+   "toNode": "xrr5q7ujm82g",
+   "toSide": "bottom"
   }
  ]
 }
