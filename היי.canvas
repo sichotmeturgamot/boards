@@ -2,8 +2,8 @@
  "nodes": [
   {
    "id": "wpb7rizyifji",
-   "x": -304,
-   "y": -136,
+   "x": -960,
+   "y": 0,
    "type": "text",
    "text": "**הרב בומי שליט\"א**",
    "width": 392,
@@ -15,8 +15,8 @@
   {
    "id": "zzedpl8gjiqz",
    "type": "image",
-   "x": -56,
-   "y": 56,
+   "x": -1368,
+   "y": -136,
    "width": 448,
    "height": 352,
    "ar": 1.2924,
@@ -27,7 +27,7 @@
    "id": "5hclwpisvhip",
    "type": "image",
    "x": -552,
-   "y": 64,
+   "y": -160,
    "width": 320,
    "height": 427,
    "ar": 0.75,
@@ -36,8 +36,8 @@
   },
   {
    "id": "jnx5xpih381k",
-   "x": -248,
-   "y": 640,
+   "x": -552,
+   "y": 304,
    "type": "text",
    "text": "- [ ] **לתרגם\n- [ ] להוסיף הערות\n- [ ] לעמוד\n- [ ] לכתו******\n- [ ] ",
    "width": 352,
@@ -51,23 +51,17 @@
   {
    "id": "irktm8riv672",
    "fromNode": "wpb7rizyifji",
-   "fromSide": "bottom",
-   "toNode": "zzedpl8gjiqz",
-   "toSide": "top"
+   "toNode": "zzedpl8gjiqz"
   },
   {
    "id": "yf8fzua0vs5j",
    "fromNode": "5hclwpisvhip",
-   "fromSide": "top",
-   "toNode": "wpb7rizyifji",
-   "toSide": "bottom"
+   "toNode": "wpb7rizyifji"
   },
   {
    "id": "rw7d1mt6590w",
    "fromNode": "jnx5xpih381k",
-   "fromSide": "top",
-   "toNode": "zzedpl8gjiqz",
-   "toSide": "bottom"
+   "toNode": "zzedpl8gjiqz"
   }
  ],
  "luach": {
