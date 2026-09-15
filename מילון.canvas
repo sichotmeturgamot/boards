@@ -28,7 +28,8 @@
    "type": "group",
    "label": "קבוצה",
    "width": 368,
-   "height": 576
+   "height": 576,
+   "bg": "4"
   }
  ],
  "edges": [
