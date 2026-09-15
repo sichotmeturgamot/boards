@@ -2,12 +2,12 @@
  "nodes": [
   {
    "id": "wpb7rizyifji",
-   "x": -208,
-   "y": -144,
+   "x": -296,
+   "y": -136,
    "type": "text",
    "text": "**הרב בומי שליט\"א**",
    "width": 384,
-   "height": 112,
+   "height": 120,
    "bg": "1",
    "align": "center",
    "size": 1.75
