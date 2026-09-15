@@ -42,6 +42,13 @@
    "fromSide": "bottom",
    "toNode": "zzedpl8gjiqz",
    "toSide": "top"
+  },
+  {
+   "id": "yf8fzua0vs5j",
+   "fromNode": "5hclwpisvhip",
+   "fromSide": "top",
+   "toNode": "wpb7rizyifji",
+   "toSide": "bottom"
   }
  ],
  "luach": {
