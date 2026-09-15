@@ -36,12 +36,12 @@
   },
   {
    "id": "jnx5xpih381k",
-   "x": -168,
-   "y": 664,
+   "x": -184,
+   "y": 632,
    "type": "text",
    "text": "- [x] לתרגם\n- [x] להוסיף הערות\n- [ ] לעמוד\n- [x] לכתוב פתח דבר\n- [x] להדפיס",
-   "width": 300,
-   "height": 200
+   "width": 352,
+   "height": 320
   }
  ],
  "edges": [
@@ -57,6 +57,13 @@
    "fromNode": "5hclwpisvhip",
    "fromSide": "top",
    "toNode": "wpb7rizyifji",
+   "toSide": "bottom"
+  },
+  {
+   "id": "rw7d1mt6590w",
+   "fromNode": "jnx5xpih381k",
+   "fromSide": "top",
+   "toNode": "zzedpl8gjiqz",
    "toSide": "bottom"
   }
  ],
