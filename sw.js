@@ -1,5 +1,5 @@
 /* Service Worker — לוח (boards) — לא לגעת ב-api.github.com */
-const CACHE = "luach-boards-v1";
+const CACHE = "luach-boards-v3";
 const ASSETS = [
   "./",
   "./index.html",
@@ -29,6 +29,7 @@ self.addEventListener("fetch", (e) => {
   if (url.hostname === "api.github.com") return;
   if (url.hostname === "raw.githubusercontent.com") return;
   if (e.request.method !== "GET") return;
+  if (/\.canvas$/i.test(url.pathname)) return;
 
   const isHTML =
     e.request.mode === "navigate" ||
