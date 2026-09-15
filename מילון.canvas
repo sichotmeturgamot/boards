@@ -29,7 +29,8 @@
    "label": "",
    "width": 376,
    "height": 480,
-   "bg": "1"
+   "bg": "1",
+   "color": "1"
   }
  ],
  "edges": [
