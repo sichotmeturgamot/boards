@@ -1,4 +1,14 @@
 {
- "nodes": [],
+ "nodes": [
+  {
+   "id": "wpb7rizyifji",
+   "x": -160,
+   "y": -216,
+   "type": "text",
+   "text": "כרטיס טקסט",
+   "width": 300,
+   "height": 140
+  }
+ ],
  "edges": []
 }
