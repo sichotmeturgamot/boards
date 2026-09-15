@@ -9,6 +9,17 @@
    "width": 300,
    "height": 140,
    "bg": "1"
+  },
+  {
+   "id": "zzedpl8gjiqz",
+   "type": "image",
+   "x": -168,
+   "y": 8,
+   "width": 320,
+   "height": 248,
+   "ar": 1.2924,
+   "fit": "cover",
+   "file": "images/mu26jiqz-otnq0e-1000092378.jpg"
   }
  ],
  "edges": [],
