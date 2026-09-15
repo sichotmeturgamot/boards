@@ -22,6 +22,17 @@
    "ar": 1.2924,
    "fit": "cover",
    "file": "images/mu26jiqz-otnq0e-1000092378.jpg"
+  },
+  {
+   "id": "5hclwpisvhip",
+   "type": "image",
+   "x": -520,
+   "y": 64,
+   "width": 320,
+   "height": 427,
+   "ar": 0.75,
+   "fit": "cover",
+   "file": "images/mu27vhip-ecezgl-1000092418.jpg"
   }
  ],
  "edges": [
