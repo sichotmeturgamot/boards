@@ -2,11 +2,11 @@
  "nodes": [
   {
    "id": "wpb7rizyifji",
-   "x": -145.5694509769871,
-   "y": -141.69595962169987,
+   "x": -208,
+   "y": -144,
    "type": "text",
    "text": "**הרב בומי שליט\"א**",
-   "width": 336,
+   "width": 384,
    "height": 112,
    "bg": "1",
    "align": "center",
@@ -15,8 +15,8 @@
   {
    "id": "zzedpl8gjiqz",
    "type": "image",
-   "x": -232,
-   "y": 16,
+   "x": -100.62905056616398,
+   "y": 81.57966172580117,
    "width": 448,
    "height": 352,
    "ar": 1.2924,
@@ -24,7 +24,15 @@
    "file": "images/mu26jiqz-otnq0e-1000092378.jpg"
   }
  ],
- "edges": [],
+ "edges": [
+  {
+   "id": "irktm8riv672",
+   "fromNode": "wpb7rizyifji",
+   "fromSide": "bottom",
+   "toNode": "zzedpl8gjiqz",
+   "toSide": "top"
+  }
+ ],
  "luach": {
   "bg": "5"
  }
