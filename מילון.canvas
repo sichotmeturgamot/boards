@@ -39,7 +39,8 @@
    "type": "group",
    "label": "קבוצה",
    "width": 312,
-   "height": 512
+   "height": 512,
+   "bg": "5"
   },
   {
    "id": "c9yckpsww8kd",
