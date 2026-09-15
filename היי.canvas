@@ -13,8 +13,8 @@
   {
    "id": "zzedpl8gjiqz",
    "type": "image",
-   "x": -240,
-   "y": 88,
+   "x": -232,
+   "y": 16,
    "width": 448,
    "height": 352,
    "ar": 1.2924,
@@ -22,15 +22,7 @@
    "file": "images/mu26jiqz-otnq0e-1000092378.jpg"
   }
  ],
- "edges": [
-  {
-   "id": "m8fk4vbmkcf6",
-   "fromNode": "zzedpl8gjiqz",
-   "fromSide": "top",
-   "toNode": "wpb7rizyifji",
-   "toSide": "bottom"
-  }
- ],
+ "edges": [],
  "luach": {
   "bg": "5"
  }
