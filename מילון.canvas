@@ -33,13 +33,34 @@
    "color": "1"
   },
   {
-   "id": "a93q0qgvvka7",
-   "x": -535.0876410731175,
+   "id": "7ykzeeb5w4fs",
+   "x": -432,
    "y": -392,
    "type": "group",
    "label": "קבוצה",
-   "width": 431.0876410731175,
-   "height": 490.1378562965252
+   "width": 312,
+   "height": 512
+  },
+  {
+   "id": "c9yckpsww8kd",
+   "x": -360,
+   "y": -232,
+   "type": "text",
+   "text": "- [ ] אמאל",
+   "width": 200,
+   "height": 272,
+   "size": 2
+  },
+  {
+   "id": "z83q62m8wkyh",
+   "type": "text",
+   "text": "\n**כפילויות**",
+   "x": -368,
+   "y": -344,
+   "width": 216,
+   "height": 88,
+   "size": 2,
+   "align": "center"
   }
  ],
  "edges": [
