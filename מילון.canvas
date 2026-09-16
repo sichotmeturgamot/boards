@@ -82,7 +82,8 @@
    "label": "קבוצה",
    "width": 520,
    "height": 512,
-   "bg": "3"
+   "bg": "3",
+   "color": "3"
   },
   {
    "id": "bmiha6udpymr",
@@ -157,6 +158,13 @@
    "fromNode": "7ykzeeb5w4fs",
    "fromSide": "right",
    "toNode": "bok85njvns51",
+   "toSide": "left"
+  },
+  {
+   "id": "yjhp9nsyrsyl",
+   "fromNode": "3tbe268xpnou",
+   "fromSide": "right",
+   "toNode": "7ykzeeb5w4fs",
    "toSide": "left"
   }
  ]
