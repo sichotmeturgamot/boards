@@ -62,6 +62,17 @@
    "height": 88,
    "size": 2,
    "align": "center"
+  },
+  {
+   "id": "pe207moqp0go",
+   "x": -716.4405872124188,
+   "y": -356.45682358775815,
+   "type": "text",
+   "text": "**להוסיף למילון**",
+   "width": 300,
+   "height": 216,
+   "align": "center",
+   "size": 2
   }
  ],
  "edges": [
