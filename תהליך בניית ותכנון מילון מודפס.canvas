@@ -2,14 +2,13 @@
  "nodes": [
   {
    "id": "llhvglts3gb3",
-   "x": -136,
+   "x": -280,
    "y": -232,
    "type": "text",
-   "text": "- [ ] ",
-   "width": 300,
-   "height": 200,
-   "size": 1.75,
-   "align": "justify"
+   "text": "- [ ]ללקט מילים מספר הזכרונות\n- [ ] ",
+   "width": 448,
+   "height": 248,
+   "size": 1.75
   }
  ],
  "edges": []
