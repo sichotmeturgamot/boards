@@ -10,15 +10,6 @@
    "height": 200,
    "size": 1.75,
    "align": "justify"
-  },
-  {
-   "id": "jqu12avq3ya0",
-   "type": "text",
-   "text": "********",
-   "x": -32,
-   "y": -272,
-   "width": 300,
-   "height": 144
   }
  ],
  "edges": []
