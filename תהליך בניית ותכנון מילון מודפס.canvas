@@ -9,6 +9,15 @@
    "width": 448,
    "height": 248,
    "size": 1.75
+  },
+  {
+   "id": "gd2e0ecc50jv",
+   "type": "text",
+   "text": "",
+   "x": -72,
+   "y": -232,
+   "width": 300,
+   "height": 144
   }
  ],
  "edges": []
